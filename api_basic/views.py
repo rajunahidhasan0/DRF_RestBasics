@@ -10,8 +10,38 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import  status
 from rest_framework.views import APIView
+
+from rest_framework import mixins
+from rest_framework import generics
+
 # Create your views here.
 
+#Generic & Mixins  Class views
+class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin, mixins.RetrieveModelMixin,
+                     mixins.DestroyModelMixin):
+    serializer_class = ArticleSerializer
+    queryset = Article.objects.all()
+
+    lookup_field = 'id'
+
+    def get(self, request, id = None):
+        if id:
+            return self.retrieve(request)
+        return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def put(self, request, id=None):
+        return self.update(request, id)
+
+    def delete(self, request, id):
+        return self.destroy(request, id)
+
+
+
+#Class  Based views
 class ArticleAPIView(APIView):
 
     def get(self, request):
@@ -55,6 +85,7 @@ class ArticleDetails(APIView):
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
+#Function Based views
 @api_view(['GET','POST'])
 def article_list(request):
     if request.method == 'GET':
